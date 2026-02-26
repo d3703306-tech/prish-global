@@ -1,0 +1,30 @@
+{
+  "project": "Dallas Desi Event Tracker",
+  "version": "1.1.0",
+  "feature": "Dallas Memories Gallery",
+  "image_schema": {
+    "fields": [
+      "id",
+      "url",
+      "thumbnail_url",
+      "event_id",
+      "photographer",
+      "caption",
+      "created_at"
+    ]
+  },
+  "api_routes": {
+    "images": {
+      "GET /api/images": "List all images (paginated)",
+      "GET /api/images?event_id=X": "Filter by event",
+      "GET /api/images/:id": "Single image details"
+    }
+  },
+  "security_requirements": {
+    "exif_stripping": "MUST strip EXIF metadata (GPS, camera info) before serving images",
+    "public_fields": "Only expose: url, thumbnail_url, photographer, caption, event_id",
+    "private_fields": "NEVER expose: camera_model, gps_coordinates, original_filename"
+  },
+  "created": "2026-02-22",
+  "architect": "Architect Agent"
+}

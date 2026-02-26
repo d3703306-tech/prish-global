@@ -1,0 +1,18 @@
+{
+  "routing_strategy": "first_match",
+  "routes": [
+    { "pattern": "^@pm", "agent": "ScrumMaster" },
+    { "pattern": "^@arch", "agent": "Architect" },
+    { "pattern": "^@dev", "agent": "BackendDev" },
+    { "pattern": "^@test", "agent": "QATester" },
+    { "pattern": "^@deploy", "agent": "DevOps" },
+    { "pattern": "^@cfo", "agent": "CFO" },
+    { "pattern": "^@legal", "agent": "Legal" },
+    { "pattern": "^@market", "agent": "MarketAnalyst" },
+    { "pattern": "^@design", "agent": "Designer" },
+    { "pattern": "^@artist", "agent": "Artist" },
+    { "pattern": "^@data", "agent": "DataScientist" },
+    { "pattern": "^@sre", "agent": "SRE" },
+    { "pattern": ".*", "agent": "ScrumMaster" }
+  ]
+}

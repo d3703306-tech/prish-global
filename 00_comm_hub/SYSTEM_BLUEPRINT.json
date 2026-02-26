@@ -1,0 +1,62 @@
+{
+  "project": "PRISH GLOBAL SOLUTIONS Website",
+  "version": "1.0.0",
+  "type": "Corporate Staffing Platform",
+  "tech_stack": {
+    "frontend": "Next.js 14 + TypeScript + Tailwind CSS",
+    "backend": "Next.js API Routes + Prisma ORM",
+    "database": "PostgreSQL (Supabase or Neon)",
+    "storage": "AWS S3 (resume uploads)",
+    "auth": "NextAuth.js",
+    "hosting": "Vercel"
+  },
+  "pages": [
+    {
+      "route": "/",
+      "name": "Homepage",
+      "components": ["HeroSection", "StatsBar", "ServicesGrid", "Testimonials", "CTASection"]
+    },
+    {
+      "route": "/about",
+      "name": "About",
+      "components": ["CompanyStory", "LeadershipTeam", "GlobalPresence"]
+    },
+    {
+      "route": "/services",
+      "name": "Services",
+      "components": ["ServiceCards", "IndustryExpertise"]
+    },
+    {
+      "route": "/resume",
+      "name": "Resume Upload",
+      "components": ["UploadForm", "ProgressIndicator", "PrivacyNotice"]
+    },
+    {
+      "route": "/jobs",
+      "name": "Job Listings",
+      "components": ["JobSearch", "JobCards", "Filters"]
+    },
+    {
+      "route": "/contact",
+      "name": "Contact",
+      "components": ["ContactForm", "OfficeLocation", "SocialLinks"]
+    }
+  ],
+  "api_routes": {
+    "POST /api/resume/upload": "Secure resume upload to S3",
+    "GET /api/jobs": "List active job postings",
+    "POST /api/contact": "Submit contact form",
+    "GET /api/health": "Health check endpoint"
+  },
+  "security": {
+    "resume_storage": "AES-256 encrypted S3 bucket",
+    "file_types": "PDF, DOC, DOCX only",
+    "max_size": "5MB",
+    "gdpr_compliance": true
+  },
+  "seo": {
+    "title": "PRISH GLOBAL SOLUTIONS - Premier Staffing & HR Solutions",
+    "description": "Global staffing solutions connecting top talent with world-class companies. IT, Healthcare, Engineering & more.",
+    "keywords": "staffing, recruitment, HR solutions, job placement, talent acquisition"
+  }
+}

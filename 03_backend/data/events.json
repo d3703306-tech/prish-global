@@ -1,0 +1,29 @@
+[
+  {
+    "id": "evt_001",
+    "name": "Dallas Desi Holi Festival 2026",
+    "date": "2026-03-15",
+    "location": "Kroger Field, Dallas",
+    "category": "Festivals",
+    "description": "Annual color festival celebration",
+    "thumbnail_url": "/images/holi.jpg"
+  },
+  {
+    "id": "evt_002",
+    "name": "Tech Meetup: AI in Healthcare",
+    "date": "2026-03-20",
+    "location": "WeWork Legacy West",
+    "category": "Tech Meetups",
+    "description": "Networking for Desi tech professionals",
+    "thumbnail_url": "/images/tech.jpg"
+  },
+  {
+    "id": "evt_003",
+    "name": "Dallas Cricket League Match",
+    "date": "2026-03-22",
+    "location": "Richardson Cricket Ground",
+    "category": "Cricket",
+    "description": "Weekend tournament finals",
+    "thumbnail_url": "/images/cricket.jpg"
+  }
+]
