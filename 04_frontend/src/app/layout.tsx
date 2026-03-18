@@ -24,13 +24,13 @@ export default function RootLayout({
         <nav className="fixed top-0 w-full z-50" style={{background: 'rgba(0, 31, 63, 0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.1)'}}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-20">
-              {/* Text Logo - Hidden for now */}
+              {/* Text Logo */}
               <Link href="/" className="flex items-center">
                 <span className="text-white font-bold text-xl">PRISH</span>
                 <span className="text-phantom-gold font-bold text-xl">GLOBAL</span>
               </Link>
 
-              {/* Nav Links */}
+              {/* Nav Links - without Contact (button replaces it) */}
               <div className="hidden md:flex items-center space-x-6">
                 <Link href="/" className="text-white hover:text-[#CA9703] font-medium transition-colors text-sm">
                   Home
@@ -44,23 +44,29 @@ export default function RootLayout({
                 <Link href="/jobs" className="text-white hover:text-[#CA9703] font-medium transition-colors text-sm">
                   Jobs
                 </Link>
-                <Link href="/contact" className="text-white hover:text-[#CA9703] font-medium transition-colors text-sm">
-                  Contact
-                </Link>
               </div>
 
-              {/* Gold CTA Button - Contact */}
-              <Link
-                href="/contact"
-                className="px-5 py-2.5 rounded-lg font-bold text-sm hover:scale-105 transition-transform"
-                style={{
-                  background: 'linear-gradient(135deg, #CA9703 0%, #E5B84C 50%, #CA9703 100%)',
-                  color: '#001220',
-                  boxShadow: '0 4px 15px rgba(202, 151, 3, 0.4)'
-                }}
-              >
-                Contact Us
-              </Link>
+              {/* Phone + Contact Button - Uniform row */}
+              <div className="flex items-center gap-4">
+                <a
+                  href="tel:+919876543210"
+                  className="text-white hover:text-[#CA9703] font-medium transition-colors text-sm flex items-center gap-1"
+                >
+                  <span>📞</span>
+                  <span>+91 98765 43210</span>
+                </a>
+                <Link
+                  href="/contact"
+                  className="px-5 py-2.5 rounded-lg font-bold text-sm hover:scale-105 transition-transform"
+                  style={{
+                    background: 'linear-gradient(135deg, #CA9703 0%, #E5B84C 50%, #CA9703 100%)',
+                    color: '#001220',
+                    boxShadow: '0 4px 15px rgba(202, 151, 3, 0.4)'
+                  }}
+                >
+                  Contact Us
+                </Link>
+              </div>
             </div>
           </div>
         </nav>
