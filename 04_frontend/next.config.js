@@ -5,9 +5,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Uncomment the line below if your repo is at https://github.com/username/repo-name
   // basePath: '/prish-global',
   // assetPrefix: '/prish-global/',
+  // Uncomment the lines above if deploying to a subfolder like github.com/username/prish-global
 };
 
 module.exports = nextConfig;
