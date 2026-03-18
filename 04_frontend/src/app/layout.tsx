@@ -24,46 +24,62 @@ export default function RootLayout({
         <nav className="fixed top-0 w-full z-50" style={{background: 'rgba(0, 31, 63, 0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.1)'}}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-20">
-              {/* SVG Logo - Transparent Background */}
-              <Link href="/" className="flex items-center">
-                <img 
-                  src="/logo.svg" 
-                  alt="PRISH GLOBAL" 
-                  className="h-14"
+              {/* Logo with Brand Image */}
+              <Link href="/" className="flex items-center gap-3">
+                <img
+                  src="/logo-icon.svg"
+                  alt="PRISH GLOBAL"
+                  className="h-12 w-auto"
                 />
+                <div className="hidden lg:block">
+                  <span className="text-white font-bold text-lg">PRISH</span>
+                  <span className="text-phantom-gold font-bold text-lg">GLOBAL</span>
+                </div>
               </Link>
-              
+
+              {/* Phone Number - Visible Call to Action */}
+              <div className="hidden lg:flex items-center gap-2">
+                <a
+                  href="tel:+919876543210"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-phantom-gold/10 border border-phantom-gold/30 hover:bg-phantom-gold/20 transition-all"
+                >
+                  <span className="text-phantom-gold text-lg">📱</span>
+                  <span className="text-white font-semibold">+91 98765 43210</span>
+                </a>
+              </div>
+
               {/* Nav Links */}
-              <div className="hidden md:flex items-center space-x-8">
-                <Link href="/" className="text-white hover:text-[#CA9703] font-medium transition-colors">
+              <div className="hidden md:flex items-center space-x-6">
+                <Link href="/" className="text-white hover:text-[#CA9703] font-medium transition-colors text-sm">
                   Home
                 </Link>
-                <Link href="/about" className="text-white hover:text-[#CA9703] font-medium transition-colors">
+                <Link href="/about" className="text-white hover:text-[#CA9703] font-medium transition-colors text-sm">
                   About
                 </Link>
-                <Link href="/services" className="text-white hover:text-[#CA9703] font-medium transition-colors">
+                <Link href="/services" className="text-white hover:text-[#CA9703] font-medium transition-colors text-sm">
                   Services
                 </Link>
-                <Link href="/jobs" className="text-white hover:text-[#CA9703] font-medium transition-colors">
+                <Link href="/jobs" className="text-white hover:text-[#CA9703] font-medium transition-colors text-sm">
                   Jobs
                 </Link>
-                <Link href="/contact" className="text-white hover:text-[#CA9703] font-medium transition-colors">
+                <Link href="/contact" className="text-white hover:text-[#CA9703] font-medium transition-colors text-sm">
                   Contact
                 </Link>
               </div>
-              
+
               {/* Gold CTA Button */}
-              <Link 
-                href="/contact" 
-                className="px-6 py-2.5 rounded-lg font-bold hover:scale-105 transition-transform"
+              <a
+                href="tel:+919876543210"
+                className="px-5 py-2.5 rounded-lg font-bold text-sm hover:scale-105 transition-transform flex items-center gap-2"
                 style={{
                   background: 'linear-gradient(135deg, #CA9703 0%, #E5B84C 50%, #CA9703 100%)',
                   color: '#001220',
                   boxShadow: '0 4px 15px rgba(202, 151, 3, 0.4)'
                 }}
               >
-                Get Started
-              </Link>
+                <span>📞</span>
+                <span>Call Now</span>
+              </a>
             </div>
           </div>
         </nav>
@@ -94,7 +110,16 @@ export default function RootLayout({
                 <ul className="space-y-2 text-white/50 text-sm">
                   <li>Flat No 402, KPHB Maruthi Apartments</li>
                   <li>Gandigunta, Andhra Pradesh</li>
-                  <li>info@prishglobal.com</li>
+                  <li>
+                    <a href="mailto:info@prishglobal.com" className="hover:text-[#CA9703] transition-colors">
+                      info@prishglobal.com
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tel:+919876543210" className="hover:text-[#CA9703] transition-colors flex items-center gap-1">
+                      <span>📱</span> +91 98765 43210
+                    </a>
+                  </li>
                 </ul>
               </div>
               <div>

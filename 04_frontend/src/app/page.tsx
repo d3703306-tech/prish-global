@@ -45,9 +45,10 @@ export default function Home() {
                 PRISH GLOBAL SOLUTIONS bridges the gap between exceptional talent and world-class organizations across IT, Healthcare, Engineering, and more.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link href="/jobs" className="btn-gold text-phantom-navy px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-transform">
-                  Browse Jobs
-                </Link>
+                <a href="tel:+919876543210" className="btn-gold text-phantom-navy px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-transform flex items-center gap-2">
+                  <span>📱</span>
+                  Call Now: +91 98765 43210
+                </a>
                 <Link href="/contact" className="btn-outline px-8 py-4 rounded-xl font-semibold text-lg">
                   Contact Us
                 </Link>
@@ -236,9 +237,10 @@ export default function Home() {
               Join thousands of professionals who found their dream jobs through PRISH GLOBAL SOLUTIONS.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/jobs" className="btn-gold text-phantom-navy px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-transform">
-                Browse Jobs
-              </Link>
+              <a href="tel:+919876543210" className="btn-gold text-phantom-navy px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-transform flex items-center gap-2">
+                <span>📱</span>
+                Call Now
+              </a>
               <Link href="/contact" className="btn-outline px-8 py-4 rounded-xl font-semibold text-lg">
                 Contact Us
               </Link>
