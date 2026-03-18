@@ -84,7 +84,7 @@ function initGSAPAnimations() {
 }
 
 /* ============================================
-   THREE.JS HERO ANIMATION - HEXAGONAL NETWORK GRID
+   THREE.JS HERO ANIMATION - DYNAMIC NETWORK WITH MOUSE INTERACTION
    ============================================ */
 function initHeroCanvas() {
     const canvas = document.getElementById('heroCanvas');
@@ -92,7 +92,7 @@ function initHeroCanvas() {
 
     // Scene setup
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({
         canvas: canvas,
         alpha: true,
@@ -102,212 +102,194 @@ function initHeroCanvas() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Colors
-    const blueColor = new THREE.Color(0x365eff);
-    const goldColor = new THREE.Color(0xCA9703);
-    const cyanColor = new THREE.Color(0x00d4ff);
+    // Configuration
+    const nodeCount = 40;
+    const connectDistance = 2.5;
+    const mouseInfluenceRadius = 4;
 
-    // Create hexagonal grid nodes
-    const hexNodes = [];
-    const hexRadius = 1.2;
-    const gridSize = 4;
-    const nodesGroup = new THREE.Group();
-    scene.add(nodesGroup);
+    // Colors - brand palette
+    const blue = new THREE.Color(0x365eff);
+    const cyan = new THREE.Color(0x6B8AFF);
+    const gold = new THREE.Color(0xCA9703);
 
-    // Create hex grid positions
-    for (let row = -gridSize; row <= gridSize; row++) {
-        for (let col = -gridSize; col <= gridSize; col++) {
-            const xOffset = row % 2 === 0 ? 0 : hexRadius * 0.866;
-            const x = col * hexRadius * 1.732 + xOffset;
-            const y = row * hexRadius * 1.5;
+    // Create nodes
+    const nodes = [];
+    const nodeGroup = new THREE.Group();
+    scene.add(nodeGroup);
 
-            // Skip nodes too far from center
-            if (Math.sqrt(x * x + y * y) > hexRadius * gridSize * 1.8) continue;
+    for (let i = 0; i < nodeCount; i++) {
+        // Determine node type
+        const isKeyNode = i < 5; // 5 key nodes
+        const isGold = Math.random() > 0.7;
 
-            // Random chance to include node (creates organic gaps)
-            if (Math.random() > 0.4) {
-                // Determine if this is a key node (intersections)
-                const isKeyNode = (Math.abs(row) + Math.abs(col)) % 3 === 0;
-                const isGoldNode = Math.random() > 0.75;
+        const size = isKeyNode ? 0.18 : 0.08 + Math.random() * 0.06;
+        const color = isKeyNode ? (isGold ? gold : cyan) : (isGold ? gold : blue);
 
-                const size = isKeyNode ? 0.12 : 0.06 + Math.random() * 0.04;
-                const nodeColor = isGoldNode ? goldColor : (isKeyNode ? cyanColor : blueColor);
-
-                // Create node with glow
-                const geometry = new THREE.SphereGeometry(size, 16, 16);
-                const material = new THREE.MeshBasicMaterial({
-                    color: nodeColor,
-                    transparent: true,
-                    opacity: isKeyNode ? 1 : 0.85
-                });
-
-                const node = new THREE.Mesh(geometry, material);
-                node.position.set(x, y, (Math.random() - 0.5) * 2);
-
-                // Outer glow
-                const glowGeo = new THREE.SphereGeometry(size * 2.5, 16, 16);
-                const glowMat = new THREE.MeshBasicMaterial({
-                    color: nodeColor,
-                    transparent: true,
-                    opacity: isKeyNode ? 0.3 : 0.12,
-                    blending: THREE.AdditiveBlending
-                });
-                const glow = new THREE.Mesh(glowGeo, glowMat);
-                node.add(glow);
-
-                // Animation data
-                node.userData = {
-                    baseX: x,
-                    baseY: y,
-                    baseZ: node.position.z,
-                    speed: 0.15 + Math.random() * 0.25,
-                    offset: Math.random() * Math.PI * 2,
-                    isKey: isKeyNode,
-                    pulseOffset: Math.random() * Math.PI * 2
-                };
-
-                hexNodes.push(node);
-                nodesGroup.add(node);
-            }
-        }
-    }
-
-    // Create connections between nearby nodes (hexagonal pattern)
-    const connectionGroup = new THREE.Group();
-    scene.add(connectionGroup);
-    const connections = [];
-
-    function createConnections() {
-        // Clear existing
-        connections.forEach(c => connectionGroup.remove(c));
-        connections.length = 0;
-
-        const maxDist = hexRadius * 1.8;
-
-        hexNodes.forEach((nodeA, i) => {
-            hexNodes.forEach((nodeB, j) => {
-                if (i >= j) return;
-
-                const dist = nodeA.position.distanceTo(nodeB.position);
-                if (dist < maxDist) {
-                    const opacity = (1 - dist / maxDist) * 0.4;
-                    const material = new THREE.LineBasicMaterial({
-                        color: nodeA.userData.isKey ? 0x00d4ff : 0x365eff,
-                        transparent: true,
-                        opacity: opacity,
-                        blending: THREE.AdditiveBlending
-                    });
-
-                    const geometry = new THREE.BufferGeometry();
-                    const positions = new Float32Array([
-                        nodeA.position.x, nodeA.position.y, nodeA.position.z,
-                        nodeB.position.x, nodeB.position.y, nodeB.position.z
-                    ]);
-                    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-                    const line = new THREE.Line(geometry, material);
-                    connections.push(line);
-                    connectionGroup.add(line);
-                }
-            });
-        });
-    }
-
-    createConnections();
-
-    // Animated particles flowing through connections
-    const particleCount = 30;
-    const particles = [];
-
-    for (let i = 0; i < particleCount; i++) {
-        const pGeo = new THREE.SphereGeometry(0.03, 8, 8);
-        const pMat = new THREE.MeshBasicMaterial({
-            color: Math.random() > 0.5 ? goldColor : cyanColor,
+        // Node sphere
+        const geometry = new THREE.SphereGeometry(size, 16, 16);
+        const material = new THREE.MeshBasicMaterial({
+            color: color,
             transparent: true,
-            opacity: 0.9,
+            opacity: isKeyNode ? 1 : 0.9
+        });
+
+        const node = new THREE.Mesh(geometry, material);
+
+        // Position in a spread out area
+        node.position.set(
+            (Math.random() - 0.5) * 12,
+            (Math.random() - 0.5) * 8,
+            (Math.random() - 0.5) * 4 - 1
+        );
+
+        // Glow effect
+        const glowGeometry = new THREE.SphereGeometry(size * 2.5, 16, 16);
+        const glowMaterial = new THREE.MeshBasicMaterial({
+            color: color,
+            transparent: true,
+            opacity: isKeyNode ? 0.4 : 0.15,
             blending: THREE.AdditiveBlending
         });
-        const particle = new THREE.Mesh(pGeo, pMat);
+        const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+        node.add(glow);
 
-        // Random starting position between two nodes
-        const startNode = hexNodes[Math.floor(Math.random() * hexNodes.length)];
-        const endNode = hexNodes[Math.floor(Math.random() * hexNodes.length)];
-
-        particle.userData = {
-            nodeA: startNode,
-            nodeB: endNode,
-            progress: Math.random(),
-            speed: 0.003 + Math.random() * 0.005
+        // Animation data
+        node.userData = {
+            vx: (Math.random() - 0.5) * 0.008,
+            vy: (Math.random() - 0.5) * 0.008,
+            vz: (Math.random() - 0.5) * 0.004,
+            baseX: node.position.x,
+            baseY: node.position.y,
+            baseZ: node.position.z,
+            isKey: isKeyNode,
+            pulsePhase: Math.random() * Math.PI * 2
         };
 
-        particles.push(particle);
-        scene.add(particle);
+        nodes.push(node);
+        nodeGroup.add(node);
     }
 
-    camera.position.z = 8;
+    // Connection lines - we'll recreate each frame for dynamic effect
+    const lineMaterial = new THREE.LineBasicMaterial({
+        color: 0x365eff,
+        transparent: true,
+        opacity: 0.35,
+        blending: THREE.AdditiveBlending
+    });
 
-    // Mouse interaction
-    let mouseX = 0;
-    let mouseY = 0;
-    let targetRotX = 0;
-    let targetRotY = 0;
+    // Mouse tracking
+    const mouse = new THREE.Vector2(0, 0);
+    const mouse3D = new THREE.Vector3(0, 0, 0);
+    let isMouseMoving = false;
+    let mouseTimeout;
 
     document.addEventListener('mousemove', (event) => {
-        mouseX = (event.clientX / window.innerWidth - 0.5) * 2;
-        mouseY = (event.clientY / window.innerHeight - 0.5) * 2;
+        // Convert to normalized coordinates (-1 to 1)
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        // Project to 3D space (approximate)
+        mouse3D.set(mouse.x * 6, mouse.y * 4, 0);
+
+        isMouseMoving = true;
+        clearTimeout(mouseTimeout);
+        mouseTimeout = setTimeout(() => { isMouseMoving = false; }, 100);
     });
+
+    // Get distance between two nodes
+    function getDistance(a, b) {
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const dz = a.z - b.z;
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
 
     // Animation loop
     let time = 0;
+    let lineGeometry = null;
+    let lineMesh = null;
+
     function animate() {
         requestAnimationFrame(animate);
         time += 0.016;
 
-        // Gentle scene rotation based on mouse
-        targetRotX = mouseY * 0.15;
-        targetRotY = mouseX * 0.15;
-
-        nodesGroup.rotation.x += (targetRotX - nodesGroup.rotation.x) * 0.03;
-        nodesGroup.rotation.y += (targetRotY - nodesGroup.rotation.y) * 0.03;
-        connectionGroup.rotation.x = nodesGroup.rotation.x;
-        connectionGroup.rotation.y = nodesGroup.rotation.y;
-
-        // Animate nodes - breathing/pulsing effect
-        hexNodes.forEach((node, i) => {
+        // Update nodes
+        nodes.forEach((node, i) => {
             const data = node.userData;
 
-            // Gentle floating
-            node.position.x = data.baseX + Math.sin(time * data.speed + data.offset) * 0.15;
-            node.position.y = data.baseY + Math.cos(time * data.speed * 0.8 + data.offset) * 0.15;
-            node.position.z = data.baseZ + Math.sin(time * data.speed * 0.5 + data.offset) * 0.3;
+            // Apply velocity
+            node.position.x += data.vx;
+            node.position.y += data.vy;
+            node.position.z += data.vz;
+
+            // Boundary bounce - keep in view
+            if (Math.abs(node.position.x) > 7) data.vx *= -1;
+            if (Math.abs(node.position.y) > 5) data.vy *= -1;
+            if (Math.abs(node.position.z) > 3) data.vz *= -1;
+
+            // Mouse interaction - nodes attracted to mouse when close
+            const distToMouse = getDistance(node.position, mouse3D);
+            if (distToMouse < mouseInfluenceRadius) {
+                const force = (1 - distToMouse / mouseInfluenceRadius) * 0.015;
+                node.position.x += (mouse3D.x - node.position.x) * force;
+                node.position.y += (mouse3D.y - node.position.y) * force;
+            }
+
+            // Gentle drift back to base
+            node.position.x += (data.baseX - node.position.x) * 0.001;
+            node.position.y += (data.baseY - node.position.y) * 0.001;
+            node.position.z += (data.baseZ - node.position.z) * 0.001;
 
             // Pulse effect for key nodes
             if (data.isKey) {
-                const scale = 1 + Math.sin(time * 2 + data.pulseOffset) * 0.15;
-                node.scale.setScalar(scale);
+                const pulse = 1 + Math.sin(time * 2 + data.pulsePhase) * 0.2;
+                node.scale.setScalar(pulse);
             }
         });
 
-        // Animate flowing particles
-        particles.forEach(p => {
-            const data = p.userData;
-            data.progress += data.speed;
+        // Dynamic connections - create lines between nearby nodes
+        const positions = [];
 
-            if (data.progress > 1) {
-                data.progress = 0;
-                data.nodeA = hexNodes[Math.floor(Math.random() * hexNodes.length)];
-                data.nodeB = hexNodes[Math.floor(Math.random() * hexNodes.length)];
+        for (let i = 0; i < nodes.length; i++) {
+            for (let j = i + 1; j < nodes.length; j++) {
+                const dist = getDistance(nodes[i].position, nodes[j].position);
+
+                if (dist < connectDistance) {
+                    // Calculate opacity based on distance
+                    const opacity = (1 - dist / connectDistance);
+
+                    // Add line vertices
+                    positions.push(
+                        nodes[i].position.x, nodes[i].position.y, nodes[i].position.z,
+                        nodes[j].position.x, nodes[j].position.y, nodes[j].position.z
+                    );
+                }
             }
+        }
 
-            // Interpolate between nodes
-            p.position.x = data.nodeA.position.x + (data.nodeB.position.x - data.nodeA.position.x) * data.progress;
-            p.position.y = data.nodeA.position.y + (data.nodeB.position.y - data.nodeA.position.y) * data.progress;
-            p.position.z = data.nodeA.position.z + (data.nodeB.position.z - data.nodeA.position.z) * data.progress;
-        });
+        // Remove old lines
+        if (lineMesh) {
+            scene.remove(lineMesh);
+            lineGeometry.dispose();
+        }
 
-        // Slow overall rotation
-        nodesGroup.rotation.z += 0.0008;
-        connectionGroup.rotation.z = nodesGroup.rotation.z;
+        // Create new lines
+        if (positions.length > 0) {
+            lineGeometry = new THREE.BufferGeometry();
+            lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+
+            lineMesh = new THREE.LineSegments(lineGeometry, lineMaterial);
+            scene.add(lineMesh);
+        }
+
+        // Mouse-based scene rotation (subtle)
+        nodeGroup.rotation.y += (mouse.x * 0.1 - nodeGroup.rotation.y) * 0.02;
+        nodeGroup.rotation.x += (-mouse.y * 0.08 - nodeGroup.rotation.x) * 0.02;
+
+        // Gentle auto rotation when mouse not moving
+        if (!isMouseMoving) {
+            nodeGroup.rotation.z += 0.0005;
+        }
 
         renderer.render(scene, camera);
     }
