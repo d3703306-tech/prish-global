@@ -1,9 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  output: 'export',
+  trailingSlash: true,
   images: {
-    domains: ['images.unsplash.com'],
+    unoptimized: true,
   },
+  // Uncomment the line below if your repo is at https://github.com/username/repo-name
+  // basePath: '/prish-global',
+  // assetPrefix: '/prish-global/',
 };
 
 module.exports = nextConfig;
