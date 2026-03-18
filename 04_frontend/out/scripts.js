@@ -103,9 +103,9 @@ function initHeroCanvas() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     // Configuration
-    const nodeCount = 40;
-    const connectDistance = 2.5;
-    const mouseInfluenceRadius = 4;
+    const nodeCount = 25;
+    const connectDistance = 3;
+    const mouseInfluenceRadius = 5;
 
     // Colors - brand palette
     const blue = new THREE.Color(0x365eff);
@@ -122,32 +122,32 @@ function initHeroCanvas() {
         const isKeyNode = i < 5; // 5 key nodes
         const isGold = Math.random() > 0.7;
 
-        const size = isKeyNode ? 0.18 : 0.08 + Math.random() * 0.06;
+        const size = isKeyNode ? 0.08 : 0.03 + Math.random() * 0.03;
         const color = isKeyNode ? (isGold ? gold : cyan) : (isGold ? gold : blue);
 
         // Node sphere
-        const geometry = new THREE.SphereGeometry(size, 16, 16);
+        const geometry = new THREE.SphereGeometry(size, 12, 12);
         const material = new THREE.MeshBasicMaterial({
             color: color,
             transparent: true,
-            opacity: isKeyNode ? 1 : 0.9
+            opacity: isKeyNode ? 1 : 0.85
         });
 
         const node = new THREE.Mesh(geometry, material);
 
-        // Position in a spread out area
+        // Position in a spread out area - wider
         node.position.set(
-            (Math.random() - 0.5) * 12,
-            (Math.random() - 0.5) * 8,
-            (Math.random() - 0.5) * 4 - 1
+            (Math.random() - 0.5) * 16,
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 6 - 2
         );
 
-        // Glow effect
-        const glowGeometry = new THREE.SphereGeometry(size * 2.5, 16, 16);
+        // Glow effect - larger relative to size for softer look
+        const glowGeometry = new THREE.SphereGeometry(size * 4, 12, 12);
         const glowMaterial = new THREE.MeshBasicMaterial({
             color: color,
             transparent: true,
-            opacity: isKeyNode ? 0.4 : 0.15,
+            opacity: isKeyNode ? 0.25 : 0.08,
             blending: THREE.AdditiveBlending
         });
         const glow = new THREE.Mesh(glowGeometry, glowMaterial);
@@ -169,11 +169,15 @@ function initHeroCanvas() {
         nodeGroup.add(node);
     }
 
+    // Position camera further back
+    camera.position.z = 12;
+    camera.position.y = 0;
+
     // Connection lines - we'll recreate each frame for dynamic effect
     const lineMaterial = new THREE.LineBasicMaterial({
         color: 0x365eff,
         transparent: true,
-        opacity: 0.35,
+        opacity: 0.2,
         blending: THREE.AdditiveBlending
     });
 
