@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initStatsCounter();
     initMobileMenu();
     initSmoothScroll();
-    initFeatureCards();
 });
 
 /* ============================================
@@ -88,7 +87,7 @@ function initGSAPAnimations() {
    THREE.JS HERO ANIMATION - SIMPLE FLOATING SHAPES
    ============================================ */
 function initHeroCanvas() {
-    const canvas = document.getElementById('hero-canvas');
+    const canvas = document.getElementById('heroCanvas');
     if (!canvas) return;
 
     // Scene setup
