@@ -29,7 +29,7 @@ function initNavbar() {
 }
 
 /* ============================================
-   THREE.JS HERO ANIMATION - PROFESSIONAL NETWORK PARTICLES
+   THREE.JS HERO ANIMATION - PROFESSIONAL NETWORK CONSTELLATION
    ============================================ */
 function initHeroCanvas() {
     const canvas = document.getElementById('heroCanvas');
@@ -47,93 +47,138 @@ function initHeroCanvas() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Professional network particles - connected dots representing talent network
-    const particles = [];
-    const particleCount = 60;
-    const connectionDistance = 1.8;
+    // Network nodes - representing talent/companies
+    const nodes = [];
+    const nodeCount = 25;
+    const connectionDistance = 3.5;
 
-    // Brand colors - subtle blue and gold
-    const colors = [0x365eff, 0x6B8AFF, 0xCA9703, 0xD4A843];
+    // Brand colors - blue and gold
+    const blueColor = new THREE.Color(0x365eff);
+    const goldColor = new THREE.Color(0xCA9703);
+    const lightBlueColor = new THREE.Color(0x6B8AFF);
 
-    // Create particles
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
+    // Create node spheres with glow effect
+    for (let i = 0; i < nodeCount; i++) {
+        const isKeyNode = i < 4; // 4 key nodes (larger)
+        const size = isKeyNode ? 0.15 + Math.random() * 0.1 : 0.05 + Math.random() * 0.08;
 
-    for (let i = 0; i < particleCount; i++) {
-        // Spread particles across the scene
-        const x = (Math.random() - 0.5) * 20;
-        const y = (Math.random() - 0.5) * 16;
-        const z = (Math.random() - 0.5) * 8 - 3;
+        // Pick color - mostly blue, some gold for variety
+        const colorChoice = Math.random();
+        let nodeColor;
+        if (isKeyNode) {
+            nodeColor = colorChoice > 0.5 ? blueColor : goldColor;
+        } else {
+            nodeColor = colorChoice > 0.7 ? goldColor : lightBlueColor;
+        }
 
-        positions[i * 3] = x;
-        positions[i * 3 + 1] = y;
-        positions[i * 3 + 2] = z;
-
-        // Store particle data for animation
-        particles.push({
-            x: x,
-            y: y,
-            z: z,
-            originalX: x,
-            originalY: y,
-            speed: 0.0003 + Math.random() * 0.0005,
-            offset: Math.random() * Math.PI * 2,
-            color: colors[Math.floor(Math.random() * colors.length)]
+        const geometry = new THREE.SphereGeometry(size, 16, 16);
+        const material = new THREE.MeshBasicMaterial({
+            color: nodeColor,
+            transparent: true,
+            opacity: 0.9
         });
+
+        const node = new THREE.Mesh(geometry, material);
+
+        // Position in a loose constellation pattern
+        node.position.x = (Math.random() - 0.5) * 14;
+        node.position.y = (Math.random() - 0.5) * 10;
+        node.position.z = (Math.random() - 0.5) * 6 - 2;
+
+        // Add glow effect (larger transparent sphere)
+        const glowGeometry = new THREE.SphereGeometry(size * 2, 16, 16);
+        const glowMaterial = new THREE.MeshBasicMaterial({
+            color: nodeColor,
+            transparent: true,
+            opacity: 0.15,
+            blending: THREE.AdditiveBlending
+        });
+        const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+        node.add(glow);
+
+        // Store animation data
+        node.userData = {
+            originalPos: node.position.clone(),
+            speed: 0.3 + Math.random() * 0.4,
+            offset: Math.random() * Math.PI * 2,
+            floatRange: 0.3 + Math.random() * 0.4
+        };
+
+        nodes.push(node);
+        scene.add(node);
     }
 
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-    // Subtle particle material - soft glow
-    const material = new THREE.PointsMaterial({
-        color: 0x6B8AFF,
-        size: 0.08,
-        transparent: true,
-        opacity: 0.6,
-        blending: THREE.AdditiveBlending,
-        sizeAttenuation: true
-    });
-
-    const particleSystem = new THREE.Points(geometry, material);
-    scene.add(particleSystem);
-
-    // Create subtle connection lines between nearby particles
+    // Create dynamic connections between nearby nodes
     const lineMaterial = new THREE.LineBasicMaterial({
         color: 0x365eff,
         transparent: true,
-        opacity: 0.08,
+        opacity: 0.25,
         blending: THREE.AdditiveBlending
     });
 
-    const lineGeometries = [];
-    const lines = new THREE.Group();
+    // Store connections for animation
+    const connections = [];
 
-    for (let i = 0; i < particleCount; i++) {
-        for (let j = i + 1; j < particleCount; j++) {
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const dz = particles[i].z - particles[j].z;
-            const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    function updateConnections() {
+        // Remove old connections
+        connections.forEach(conn => scene.remove(conn));
+        connections.length = 0;
 
-            if (dist < connectionDistance) {
-                const lineGeometry = new THREE.BufferGeometry();
-                const linePositions = new Float32Array([
-                    particles[i].x, particles[i].y, particles[i].z,
-                    particles[j].x, particles[j].y, particles[j].z
-                ]);
-                lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
-                const line = new THREE.Line(lineGeometry, lineMaterial);
-                lines.add(line);
+        // Create new connections based on current positions
+        for (let i = 0; i < nodeCount; i++) {
+            for (let j = i + 1; j < nodeCount; j++) {
+                const dist = nodes[i].position.distanceTo(nodes[j].position);
+
+                if (dist < connectionDistance) {
+                    const geometry = new THREE.BufferGeometry();
+                    const positions = new Float32Array([
+                        nodes[i].position.x, nodes[i].position.y, nodes[i].position.z,
+                        nodes[j].position.x, nodes[j].position.y, nodes[j].position.z
+                    ]);
+                    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+                    // Opacity based on distance - closer = more visible
+                    const opacity = 0.25 * (1 - dist / connectionDistance);
+                    const mat = lineMaterial.clone();
+                    mat.opacity = opacity;
+
+                    const line = new THREE.Line(geometry, mat);
+                    line.userData = { nodeA: i, nodeB: j };
+                    connections.push(line);
+                    scene.add(line);
+                }
             }
         }
     }
-    scene.add(lines);
 
-    // Subtle ambient light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-    scene.add(ambientLight);
+    // Initial connections
+    updateConnections();
 
-    camera.position.z = 5;
+    // Add subtle ambient particles in background
+    const bgParticleCount = 200;
+    const bgGeometry = new THREE.BufferGeometry();
+    const bgPositions = new Float32Array(bgParticleCount * 3);
+
+    for (let i = 0; i < bgParticleCount; i++) {
+        bgPositions[i * 3] = (Math.random() - 0.5) * 25;
+        bgPositions[i * 3 + 1] = (Math.random() - 0.5) * 18;
+        bgPositions[i * 3 + 2] = (Math.random() - 0.5) * 10 - 5;
+    }
+
+    bgGeometry.setAttribute('position', new THREE.BufferAttribute(bgPositions, 3));
+
+    const bgMaterial = new THREE.PointsMaterial({
+        color: 0x6B8AFF,
+        size: 0.03,
+        transparent: true,
+        opacity: 0.4,
+        blending: THREE.AdditiveBlending
+    });
+
+    const bgParticles = new THREE.Points(bgGeometry, bgMaterial);
+    scene.add(bgParticles);
+
+    camera.position.z = 6;
 
     // Mouse interaction
     let mouseX = 0;
@@ -148,25 +193,33 @@ function initHeroCanvas() {
     let time = 0;
     function animate() {
         requestAnimationFrame(animate);
-        time += 0.001;
+        time += 0.016;
 
-        // Animate particles - subtle floating motion
-        const posAttr = particleSystem.geometry.attributes.position;
-        particles.forEach((p, i) => {
-            // Very subtle floating movement
-            p.x = p.originalX + Math.sin(time * 0.5 + p.offset) * 0.3;
-            p.y = p.originalY + Math.cos(time * 0.3 + p.offset) * 0.2;
+        // Animate main network nodes
+        nodes.forEach((node, i) => {
+            const data = node.userData;
 
-            posAttr.setXYZ(i, p.x, p.y, p.z);
+            // Floating motion
+            node.position.x = data.originalPos.x + Math.sin(time * data.speed + data.offset) * data.floatRange;
+            node.position.y = data.originalPos.y + Math.cos(time * data.speed * 0.7 + data.offset) * data.floatRange;
+
+            // Gentle rotation
+            node.rotation.y += 0.002;
+            node.rotation.x += 0.001;
         });
-        posAttr.needsUpdate = true;
 
-        // Subtle particle rotation
-        particleSystem.rotation.y = time * 0.02;
+        // Update connections every few frames
+        if (Math.floor(time * 60) % 3 === 0) {
+            updateConnections();
+        }
 
-        // Mouse parallax - very subtle
-        camera.position.x += (mouseX * 0.3 - camera.position.x) * 0.01;
-        camera.position.y += (mouseY * 0.3 - camera.position.y) * 0.01;
+        // Subtle background particle drift
+        bgParticles.rotation.y = time * 0.01;
+        bgParticles.rotation.x = time * 0.005;
+
+        // Mouse parallax
+        camera.position.x += (mouseX * 1 - camera.position.x) * 0.02;
+        camera.position.y += (mouseY * 0.8 - camera.position.y) * 0.02;
         camera.lookAt(0, 0, 0);
 
         renderer.render(scene, camera);
