@@ -221,10 +221,11 @@ function initStatsCounter() {
 }
 
 function animateStats() {
-    const statNumbers = document.querySelectorAll('.stat-number');
+    const statItems = document.querySelectorAll('.stat-item');
 
-    statNumbers.forEach(stat => {
-        const target = parseInt(stat.getAttribute('data-target'));
+    statItems.forEach(item => {
+        const statNumber = item.querySelector('.stat-number');
+        const target = parseInt(item.getAttribute('data-target'));
         const duration = 2000;
         const step = target / (duration / 16);
         let current = 0;
@@ -235,7 +236,7 @@ function animateStats() {
                 current = target;
                 clearInterval(counter);
             }
-            stat.textContent = Math.floor(current);
+            statNumber.textContent = Math.floor(current);
         }, 16);
     });
 }
