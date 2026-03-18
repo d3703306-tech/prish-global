@@ -29,12 +29,13 @@ function initNavbar() {
 }
 
 /* ============================================
-   THREE.JS HERO ANIMATION
+   THREE.JS HERO ANIMATION - PROFESSIONAL NETWORK PARTICLES
    ============================================ */
 function initHeroCanvas() {
     const canvas = document.getElementById('heroCanvas');
     if (!canvas) return;
 
+    // Scene setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({
@@ -46,74 +47,93 @@ function initHeroCanvas() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Create particles
-    const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 1500;
-    const posArray = new Float32Array(particlesCount * 3);
+    // Professional network particles - connected dots representing talent network
+    const particles = [];
+    const particleCount = 60;
+    const connectionDistance = 1.8;
 
-    for (let i = 0; i < particlesCount * 3; i++) {
-        posArray[i] = (Math.random() - 0.5) * 10;
+    // Brand colors - subtle blue and gold
+    const colors = [0x365eff, 0x6B8AFF, 0xCA9703, 0xD4A843];
+
+    // Create particles
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount; i++) {
+        // Spread particles across the scene
+        const x = (Math.random() - 0.5) * 20;
+        const y = (Math.random() - 0.5) * 16;
+        const z = (Math.random() - 0.5) * 8 - 3;
+
+        positions[i * 3] = x;
+        positions[i * 3 + 1] = y;
+        positions[i * 3 + 2] = z;
+
+        // Store particle data for animation
+        particles.push({
+            x: x,
+            y: y,
+            z: z,
+            originalX: x,
+            originalY: y,
+            speed: 0.0003 + Math.random() * 0.0005,
+            offset: Math.random() * Math.PI * 2,
+            color: colors[Math.floor(Math.random() * colors.length)]
+        });
     }
 
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-    // Create gradient particles material
-    const particlesMaterial = new THREE.PointsMaterial({
-        size: 0.02,
-        color: 0x365eff,
+    // Subtle particle material - soft glow
+    const material = new THREE.PointsMaterial({
+        color: 0x6B8AFF,
+        size: 0.08,
         transparent: true,
-        opacity: 0.8,
-        blending: THREE.AdditiveBlending
+        opacity: 0.6,
+        blending: THREE.AdditiveBlending,
+        sizeAttenuation: true
     });
 
-    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-    scene.add(particlesMesh);
+    const particleSystem = new THREE.Points(geometry, material);
+    scene.add(particleSystem);
 
-    // Create floating geometric shapes
-    const shapes = [];
-    const shapeGeometries = [
-        new THREE.TetrahedronGeometry(0.3),
-        new THREE.OctahedronGeometry(0.25),
-        new THREE.IcosahedronGeometry(0.2)
-    ];
-
-    for (let i = 0; i < 15; i++) {
-        const geometry = shapeGeometries[Math.floor(Math.random() * shapeGeometries.length)];
-        const material = new THREE.MeshBasicMaterial({
-            color: Math.random() > 0.5 ? 0x365eff : 0xCA9703,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.3
-        });
-
-        const shape = new THREE.Mesh(geometry, material);
-
-        shape.position.x = (Math.random() - 0.5) * 8;
-        shape.position.y = (Math.random() - 0.5) * 8;
-        shape.position.z = (Math.random() - 0.5) * 5;
-
-        shape.rotation.x = Math.random() * Math.PI;
-        shape.rotation.y = Math.random() * Math.PI;
-
-        shapes.push(shape);
-        scene.add(shape);
-    }
-
-    // Create connection lines
+    // Create subtle connection lines between nearby particles
     const lineMaterial = new THREE.LineBasicMaterial({
         color: 0x365eff,
         transparent: true,
-        opacity: 0.1
+        opacity: 0.08,
+        blending: THREE.AdditiveBlending
     });
 
-    const lineGeometry = new THREE.BufferGeometry();
-    const linePositions = new Float32Array(300);
-    lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+    const lineGeometries = [];
+    const lines = new THREE.Group();
 
-    const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+    for (let i = 0; i < particleCount; i++) {
+        for (let j = i + 1; j < particleCount; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dz = particles[i].z - particles[j].z;
+            const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+            if (dist < connectionDistance) {
+                const lineGeometry = new THREE.BufferGeometry();
+                const linePositions = new Float32Array([
+                    particles[i].x, particles[i].y, particles[i].z,
+                    particles[j].x, particles[j].y, particles[j].z
+                ]);
+                lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+                const line = new THREE.Line(lineGeometry, lineMaterial);
+                lines.add(line);
+            }
+        }
+    }
     scene.add(lines);
 
-    camera.position.z = 3;
+    // Subtle ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(ambientLight);
+
+    camera.position.z = 5;
 
     // Mouse interaction
     let mouseX = 0;
@@ -130,20 +150,23 @@ function initHeroCanvas() {
         requestAnimationFrame(animate);
         time += 0.001;
 
-        // Rotate particles
-        particlesMesh.rotation.y = time * 0.1;
-        particlesMesh.rotation.x = time * 0.05;
+        // Animate particles - subtle floating motion
+        const posAttr = particleSystem.geometry.attributes.position;
+        particles.forEach((p, i) => {
+            // Very subtle floating movement
+            p.x = p.originalX + Math.sin(time * 0.5 + p.offset) * 0.3;
+            p.y = p.originalY + Math.cos(time * 0.3 + p.offset) * 0.2;
 
-        // Animate shapes
-        shapes.forEach((shape, index) => {
-            shape.rotation.x += 0.005 * (index + 1);
-            shape.rotation.y += 0.005 * (index + 1);
-            shape.position.y += Math.sin(time * 2 + index) * 0.001;
+            posAttr.setXYZ(i, p.x, p.y, p.z);
         });
+        posAttr.needsUpdate = true;
 
-        // Mouse parallax effect
-        camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
-        camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.05;
+        // Subtle particle rotation
+        particleSystem.rotation.y = time * 0.02;
+
+        // Mouse parallax - very subtle
+        camera.position.x += (mouseX * 0.3 - camera.position.x) * 0.01;
+        camera.position.y += (mouseY * 0.3 - camera.position.y) * 0.01;
         camera.lookAt(0, 0, 0);
 
         renderer.render(scene, camera);
