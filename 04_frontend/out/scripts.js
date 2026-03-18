@@ -1,16 +1,18 @@
 /* ============================================
    PRISH GLOBAL - Main Scripts
-   Three.js Hero Animation, Scroll Effects, Interactions
+   Three.js + GSAP Animations
    ============================================ */
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
     initHeroCanvas();
+    initGSAPAnimations();
     initScrollAnimations();
     initStatsCounter();
     initMobileMenu();
     initSmoothScroll();
+    initFeatureCards();
 });
 
 /* ============================================
@@ -29,12 +31,67 @@ function initNavbar() {
 }
 
 /* ============================================
-   THREE.JS HERO ANIMATION
+   GSAP ANIMATIONS FOR HERO TEXT
+   ============================================ */
+function initGSAPAnimations() {
+    // Wait for load
+    window.addEventListener('load', () => {
+        // Animate hero elements with GSAP
+        gsap.to(".hero-badge", {
+            duration: 1,
+            y: 0,
+            opacity: 1,
+            ease: "power2.out"
+        });
+
+        gsap.to(".hero-title", {
+            duration: 1,
+            y: 0,
+            opacity: 1,
+            delay: 0.2,
+            ease: "power2.out"
+        });
+
+        gsap.to(".hero-subtitle", {
+            duration: 1,
+            y: 0,
+            opacity: 1,
+            delay: 0.4,
+            ease: "power2.out"
+        });
+
+        gsap.to(".hero-cta", {
+            duration: 1,
+            y: 0,
+            opacity: 1,
+            delay: 0.6,
+            ease: "power2.out"
+        });
+
+        gsap.to(".scroll-indicator", {
+            duration: 1,
+            opacity: 1,
+            delay: 1,
+            ease: "power2.out"
+        });
+    });
+
+    // Set initial state
+    gsap.set(".hero-badge", { y: 30, opacity: 0 });
+    gsap.set(".hero-title", { y: 50, opacity: 0 });
+    gsap.set(".hero-subtitle", { y: 30, opacity: 0 });
+    gsap.set(".hero-cta", { y: 30, opacity: 0 });
+    gsap.set(".scroll-indicator", { opacity: 0 });
+}
+
+/* ============================================
+   THREE.JS HERO ANIMATION - SIMPLE FLOATING SHAPES
    ============================================ */
 function initHeroCanvas() {
-    const canvas = document.getElementById('heroCanvas');
+    const canvas = document.getElementById('hero-canvas');
     if (!canvas) return;
 
+    // Scene setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({
@@ -46,74 +103,66 @@ function initHeroCanvas() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Create particles
-    const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 1500;
-    const posArray = new Float32Array(particlesCount * 3);
-
-    for (let i = 0; i < particlesCount * 3; i++) {
-        posArray[i] = (Math.random() - 0.5) * 10;
-    }
-
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-
-    // Create gradient particles material
-    const particlesMaterial = new THREE.PointsMaterial({
-        size: 0.02,
-        color: 0x365eff,
-        transparent: true,
-        opacity: 0.8,
-        blending: THREE.AdditiveBlending
-    });
-
-    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-    scene.add(particlesMesh);
-
-    // Create floating geometric shapes
+    // Create floating shapes - mix of geometries
     const shapes = [];
-    const shapeGeometries = [
-        new THREE.TetrahedronGeometry(0.3),
-        new THREE.OctahedronGeometry(0.25),
-        new THREE.IcosahedronGeometry(0.2)
+    const colors = [0x365eff, 0x4d70ff, 0xCA9703, 0xE5B84C];
+
+    const geometries = [
+        new THREE.SphereGeometry(0.5, 32, 32),
+        new THREE.TetrahedronGeometry(0.5),
+        new THREE.OctahedronGeometry(0.5),
+        new THREE.IcosahedronGeometry(0.4),
+        new THREE.TorusGeometry(0.4, 0.15, 16, 32)
     ];
 
-    for (let i = 0; i < 15; i++) {
-        const geometry = shapeGeometries[Math.floor(Math.random() * shapeGeometries.length)];
-        const material = new THREE.MeshBasicMaterial({
-            color: Math.random() > 0.5 ? 0x365eff : 0xCA9703,
-            wireframe: true,
+    for (let i = 0; i < 20; i++) {
+        const geometry = geometries[Math.floor(Math.random() * geometries.length)];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+
+        const material = new THREE.MeshStandardMaterial({
+            color: color,
+            roughness: 0.3,
+            metalness: 0.5,
             transparent: true,
-            opacity: 0.3
+            opacity: 0.8
         });
 
         const shape = new THREE.Mesh(geometry, material);
 
-        shape.position.x = (Math.random() - 0.5) * 8;
-        shape.position.y = (Math.random() - 0.5) * 8;
-        shape.position.z = (Math.random() - 0.5) * 5;
+        // Random position
+        shape.position.x = (Math.random() - 0.5) * 15;
+        shape.position.y = (Math.random() - 0.5) * 15;
+        shape.position.z = (Math.random() - 0.5) * 10 - 5;
 
+        // Random rotation
         shape.rotation.x = Math.random() * Math.PI;
         shape.rotation.y = Math.random() * Math.PI;
+
+        // Store original position for animation
+        shape.userData = {
+            originalY: shape.position.y,
+            speed: 0.5 + Math.random() * 1,
+            offset: Math.random() * Math.PI * 2
+        };
 
         shapes.push(shape);
         scene.add(shape);
     }
 
-    // Create connection lines
-    const lineMaterial = new THREE.LineBasicMaterial({
-        color: 0x365eff,
-        transparent: true,
-        opacity: 0.1
-    });
+    // Ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
 
-    const lineGeometry = new THREE.BufferGeometry();
-    const linePositions = new Float32Array(300);
-    lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+    // Point lights
+    const pointLight1 = new THREE.PointLight(0x365eff, 1);
+    pointLight1.position.set(5, 5, 5);
+    scene.add(pointLight1);
 
-    const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
-    scene.add(lines);
+    const pointLight2 = new THREE.PointLight(0xCA9703, 0.5);
+    pointLight2.position.set(-5, -5, 5);
+    scene.add(pointLight2);
 
-    camera.position.z = 3;
+    camera.position.z = 8;
 
     // Mouse interaction
     let mouseX = 0;
@@ -128,22 +177,22 @@ function initHeroCanvas() {
     let time = 0;
     function animate() {
         requestAnimationFrame(animate);
-        time += 0.001;
+        time += 0.01;
 
-        // Rotate particles
-        particlesMesh.rotation.y = time * 0.1;
-        particlesMesh.rotation.x = time * 0.05;
-
-        // Animate shapes
+        // Animate each shape
         shapes.forEach((shape, index) => {
-            shape.rotation.x += 0.005 * (index + 1);
+            // Rotation
+            shape.rotation.x += 0.003 * (index + 1);
             shape.rotation.y += 0.005 * (index + 1);
-            shape.position.y += Math.sin(time * 2 + index) * 0.001;
+
+            // Floating motion
+            shape.position.y = shape.userData.originalY +
+                Math.sin(time * shape.userData.speed + shape.userData.offset) * 0.5;
         });
 
-        // Mouse parallax effect
-        camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
-        camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.05;
+        // Mouse parallax
+        camera.position.x += (mouseX * 2 - camera.position.x) * 0.02;
+        camera.position.y += (mouseY * 2 - camera.position.y) * 0.02;
         camera.lookAt(0, 0, 0);
 
         renderer.render(scene, camera);
