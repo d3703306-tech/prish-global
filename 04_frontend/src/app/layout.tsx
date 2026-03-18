@@ -24,29 +24,11 @@ export default function RootLayout({
         <nav className="fixed top-0 w-full z-50" style={{background: 'rgba(0, 31, 63, 0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.1)'}}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-20">
-              {/* Logo with Brand Image */}
-              <Link href="/" className="flex items-center gap-3">
-                <img
-                  src="/logo-icon.svg"
-                  alt="PRISH GLOBAL"
-                  className="h-12 w-auto"
-                />
-                <div className="hidden lg:block">
-                  <span className="text-white font-bold text-lg">PRISH</span>
-                  <span className="text-phantom-gold font-bold text-lg">GLOBAL</span>
-                </div>
+              {/* Text Logo - Hidden for now */}
+              <Link href="/" className="flex items-center">
+                <span className="text-white font-bold text-xl">PRISH</span>
+                <span className="text-phantom-gold font-bold text-xl">GLOBAL</span>
               </Link>
-
-              {/* Phone Number - Visible Call to Action */}
-              <div className="hidden lg:flex items-center gap-2">
-                <a
-                  href="tel:+919876543210"
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-phantom-gold/10 border border-phantom-gold/30 hover:bg-phantom-gold/20 transition-all"
-                >
-                  <span className="text-phantom-gold text-lg">📱</span>
-                  <span className="text-white font-semibold">+91 98765 43210</span>
-                </a>
-              </div>
 
               {/* Nav Links */}
               <div className="hidden md:flex items-center space-x-6">
@@ -67,19 +49,18 @@ export default function RootLayout({
                 </Link>
               </div>
 
-              {/* Gold CTA Button */}
-              <a
-                href="tel:+919876543210"
-                className="px-5 py-2.5 rounded-lg font-bold text-sm hover:scale-105 transition-transform flex items-center gap-2"
+              {/* Gold CTA Button - Contact */}
+              <Link
+                href="/contact"
+                className="px-5 py-2.5 rounded-lg font-bold text-sm hover:scale-105 transition-transform"
                 style={{
                   background: 'linear-gradient(135deg, #CA9703 0%, #E5B84C 50%, #CA9703 100%)',
                   color: '#001220',
                   boxShadow: '0 4px 15px rgba(202, 151, 3, 0.4)'
                 }}
               >
-                <span>📞</span>
-                <span>Call Now</span>
-              </a>
+                Contact Us
+              </Link>
             </div>
           </div>
         </nav>
@@ -91,8 +72,9 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid md:grid-cols-4 gap-8">
               <div>
-                <img src="/logo.svg" alt="PRISH" className="h-10 mb-4" />
-                <p className="text-white/50 text-sm">
+                <span className="text-white font-bold text-lg">PRISH</span>
+                <span className="text-phantom-gold font-bold text-lg">GLOBAL</span>
+                <p className="text-white/50 text-sm mt-2">
                   Premier staffing solutions connecting top talent with world-class organizations globally.
                 </p>
               </div>
@@ -113,11 +95,6 @@ export default function RootLayout({
                   <li>
                     <a href="mailto:info@prishglobal.com" className="hover:text-[#CA9703] transition-colors">
                       info@prishglobal.com
-                    </a>
-                  </li>
-                  <li>
-                    <a href="tel:+919876543210" className="hover:text-[#CA9703] transition-colors flex items-center gap-1">
-                      <span>📱</span> +91 98765 43210
                     </a>
                   </li>
                 </ul>
