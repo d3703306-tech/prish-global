@@ -12,7 +12,80 @@ document.addEventListener('DOMContentLoaded', () => {
     initStatsCounter();
     initMobileMenu();
     initSmoothScroll();
+    initParallax();
+    initRevealAnimations();
 });
+
+/* ============================================
+   PARALLAX EFFECT - Subtle depth on scroll
+   ============================================ */
+function initParallax() {
+    const heroContent = document.querySelector('.hero-content');
+    const aboutCard = document.querySelector('.about-card');
+
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+
+        // Hero content subtle parallax
+        if (heroContent && scrollY < window.innerHeight) {
+            heroContent.style.transform = `translateY(${scrollY * 0.3}px)`;
+            heroContent.style.opacity = 1 - (scrollY / 600);
+        }
+
+        // About card subtle parallax
+        if (aboutCard) {
+            const rect = aboutCard.getBoundingClientRect();
+            if (rect.top < window.innerHeight) {
+                const offset = (rect.top - window.innerHeight) * 0.1;
+                aboutCard.style.transform = `translateY(${offset}px)`;
+            }
+        }
+    });
+}
+
+/* ============================================
+   REVEAL ANIMATIONS - Elegant scroll reveals
+   ============================================ */
+function initRevealAnimations() {
+    const revealElements = document.querySelectorAll(
+        '.stat-item, .feature-card, .section-header, .about-content, .cta-content, .footer-grid > div'
+    );
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                // Staggered reveal with delay
+                setTimeout(() => {
+                    entry.target.classList.add('revealed');
+                }, index * 100);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    });
+
+    revealElements.forEach(el => {
+        el.classList.add('reveal-item');
+        observer.observe(el);
+    });
+
+    // Add reveal styles dynamically
+    const style = document.createElement('style');
+    style.textContent = `
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-item.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    `;
+    document.head.appendChild(style);
+}
 
 /* ============================================
    NAVBAR SCROLL EFFECT
@@ -107,10 +180,10 @@ function initHeroCanvas() {
     const connectDistance = 3;
     const mouseInfluenceRadius = 5;
 
-    // Colors - brand palette
-    const blue = new THREE.Color(0x365eff);
-    const cyan = new THREE.Color(0x6B8AFF);
-    const gold = new THREE.Color(0xCA9703);
+    // Colors - deeper contrast for light background
+    const orange = new THREE.Color(0xea580c);  // Darker orange
+    const orangeLight = new THREE.Color(0xf97316);  // Bright orange
+    const darkColor = new THREE.Color(0x18181b);  // Near black for contrast
 
     // Create nodes
     const nodes = [];
@@ -123,7 +196,7 @@ function initHeroCanvas() {
         const isGold = Math.random() > 0.7;
 
         const size = isKeyNode ? 0.08 : 0.03 + Math.random() * 0.03;
-        const color = isKeyNode ? (isGold ? gold : cyan) : (isGold ? gold : blue);
+        const color = isKeyNode ? (isGold ? orangeLight : orangeLight) : (isGold ? orange : darkColor);
 
         // Node sphere
         const geometry = new THREE.SphereGeometry(size, 12, 12);
@@ -147,7 +220,7 @@ function initHeroCanvas() {
         const glowMaterial = new THREE.MeshBasicMaterial({
             color: color,
             transparent: true,
-            opacity: isKeyNode ? 0.25 : 0.08,
+            opacity: isKeyNode ? 0.4 : 0.15,
             blending: THREE.AdditiveBlending
         });
         const glow = new THREE.Mesh(glowGeometry, glowMaterial);
@@ -173,11 +246,11 @@ function initHeroCanvas() {
     camera.position.z = 12;
     camera.position.y = 0;
 
-    // Connection lines - we'll recreate each frame for dynamic effect
+    // Connection lines
     const lineMaterial = new THREE.LineBasicMaterial({
-        color: 0x365eff,
+        color: 0xea580c,  // Darker orange
         transparent: true,
-        opacity: 0.2,
+        opacity: 0.5,  // More visible on light background
         blending: THREE.AdditiveBlending
     });
 
